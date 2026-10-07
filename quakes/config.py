@@ -9,6 +9,21 @@ SEED = 42
 TARGET = "big_quake"
 
 # TODO (Task 4 and 5): fill these in after you have explored the data.
-NUMERIC: list[str] = []   # numeric feature columns
-NOMINAL: list[str] = []   # categorical feature columns (one-hot encoded)
-LEAKY: list[str] = []     # columns that encode the magnitude: must be dropped
+# NUMERIC: list[str] = [
+NUMERIC = [
+    "nst",
+    "update_lag_hours",
+    "lat",
+    "lon",
+    "depth_km",
+    ]   # numeric feature columns
+NOMINAL = [
+    "status",
+    ]   # categorical feature columns (one-hot encoded)
+# LEAKY: list[str] = [
+#     "title",
+#     "sig",
+#     "mmi",
+#     "cdi",
+#     "felt",
+#     "alert",]     # columns that encode the magnitude: must be dropped

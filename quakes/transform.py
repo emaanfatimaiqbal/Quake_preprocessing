@@ -1,6 +1,15 @@
 """Task 5: split and preprocess."""
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (
+    OneHotEncoder,
+    StandardScaler,
+    MinMaxScaler,
+    RobustScaler
+)
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
 
 from . import config
 
@@ -12,6 +21,22 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2):
     Neither the target nor 'mag' may remain in X.
     """
     ...
+    X = df.drop(
+        columns=[config.TARGET, "mag"],
+        errors="ignore"
+    )
+
+    y = df[config.TARGET]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=test_size,
+        random_state=config.SEED,
+        stratify=y
+    )
+    return X_train, X_test, y_train, y_test
+
 
 
 def build_preprocessor(scaler: str = "robust") -> ColumnTransformer:
@@ -22,3 +47,56 @@ def build_preprocessor(scaler: str = "robust") -> ColumnTransformer:
     nominal: most-frequent imputation, then one-hot (handle_unknown='ignore')
     """
     ...
+    if scaler == "standard":
+        scaler_object = StandardScaler()
+
+    elif scaler == "minmax":
+        scaler_object = MinMaxScaler()
+
+    elif scaler == "robust":
+        scaler_object = RobustScaler()
+
+    else:
+        raise ValueError(
+            "Scaler must be standard, minmax, or robust"
+        )
+
+    numeric_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", scaler_object)
+        ]
+    )
+
+    nominal_pipeline = Pipeline(
+        steps=[
+            (
+                "imputer",
+                SimpleImputer(strategy="most_frequent")
+            ),
+            (
+                "onehot",
+                OneHotEncoder(
+                    handle_unknown="ignore"
+                )
+            )
+        ]
+    )
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            (
+                "numeric",
+                numeric_pipeline,
+                config.NUMERIC
+            ),
+            (
+                "nominal",
+                nominal_pipeline,
+                config.NOMINAL
+            )
+        ]
+    )
+
+    return preprocessor
+    
