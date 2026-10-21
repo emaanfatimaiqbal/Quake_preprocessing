@@ -1,5 +1,6 @@
 """Task 1: fetch the USGS GeoJSON feed and turn it into a DataFrame."""
 import pandas as pd
+import requests
 
 BASE = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary"
 
@@ -11,7 +12,6 @@ def fetch_feed(feed: str = "all_week") -> dict:
     HTTP 200 with a plain-text body, so raise a clear error if the body
     is not valid JSON.
     """
-    ...
     url = f"{BASE}/{feed}.geojson"
 
     response = requests.get(url, timeout=15)
